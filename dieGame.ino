@@ -9,12 +9,12 @@ WiFiEspClient client;
 #define wifiEnable 4
 
 // Declare and initialise global arrays for WiFi settings
-const char ssid[] = "MartinAP";
-const char pass[] = "qwertyui";
-const char server[] = "primat.se";
-const String hostname = "primat.se";
-const String email = "mrtn.karlsson@gmail.com";
-const String xid = "martin";
+const char ssid[] = "SSID";
+const char pass[] = "PASS";
+const char server[] = "SERVER";
+const String hostname = "HOSTNAME";
+const String email = "email";
+const String xid = "ID";
 const String uri = "/services/data/" + email + "-" + xid + ".csv";
 const String senduri = "/services/sendform.aspx?xdata=" + email + "|"+xid+"|";
 const int port = 80;
