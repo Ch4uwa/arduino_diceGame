@@ -16,7 +16,7 @@ const String hostname = "primat.se";
 const String email = "mrtn.karlsson@gmail.com";
 const String xid = "martin";
 const String uri = "/services/data/timmie.nilsson@stud.stu.se-Timmie.csv";
-const String senduri = "/services/sendform.aspx?xdata=" + email + "|"+xid+"|";
+const String senduri = "/services/sendform.aspx?xdata=" + email + "|" + xid + "|";
 const int port = 80;
 
 String line;
@@ -24,10 +24,10 @@ String roll;
 // Declare and initialise variable for radio status
 int status = WL_IDLE_STATUS;
 
-int die = 0, rollCount=0;
+int die = 0, rollCount = 0;
 boolean press = false;
-int rolls=0,int_num=0;
-String dataDie,num;
+int rolls = 0, int_num = 0;
+String dataDie, num;
 
 void setup()
 {
@@ -35,18 +35,14 @@ void setup()
     pinMode(getPin, INPUT);
     pinMode(wifiEnable, OUTPUT);
 
-    
-
     Serial.begin(115200);
     Serial1.begin(9600);
-
-    
 
     // Initialize ESP module
     WiFi.init(&Serial1);
     //digitalWrite(wifiEnable,HIGH);
     // Check for the presence of the shield
-    
+
     if (WiFi.status() == WL_NO_SHIELD)
     {
         Serial.println("WiFi shield not present");
@@ -75,7 +71,6 @@ void setup()
 void loop()
 {
 
-
     while (digitalRead(rollPin) == HIGH)
     {
         press = true;
@@ -89,7 +84,6 @@ void loop()
 
         sendData();
         delay(1000);
-        
     }
     while (digitalRead(getPin) == HIGH)
     {
@@ -100,43 +94,41 @@ void loop()
         press = false;
         readData();
         delay(1000);
-        rollCount=0;
-    
+        rollCount = 0;
 
-    if (line=="P1") {
-        if (die > int_num) {
-            Serial.println("I'm the winner!");
-            Serial.println("My Roll: ");
-            Serial.print(die);
-            Serial.println("Your Roll: ");
-            Serial.print(int_num);
-        }
-        else if (die < int_num) {
-            Serial.println("You are the winner!");
-            Serial.println("My Roll: ");
-            Serial.print(die);
-            Serial.println("Your Roll: ");
-            Serial.print(int_num);
+        if (line == "P1")
+        {
+            if (die > int_num)
+            {
+                Serial.println("I'm the winner!");
+                Serial.print("My Roll: ");
+                Serial.println(die);
+                Serial.print("Your Roll: ");
+                Serial.print(int_num);
+            }
+            else if (die < int_num)
+            {
+                Serial.println("You are the winner!");
+                Serial.print("My Roll: ");
+                Serial.println(die);
+                Serial.print("Your Roll: ");
+                Serial.print(int_num);
+            }
+            else
+            {
+                Serial.println("Even!");
+                Serial.print("My Roll: ");
+                Serial.println(die);
+                Serial.print("Your Roll: ");
+                Serial.print(int_num);
+            }
         }
         else
         {
-            Serial.println("Even!");
-            Serial.println("My Roll: ");
-            Serial.print(die);
-            Serial.println("Your Roll: ");
-            Serial.print(int_num);
+            Serial.println("P2 needs to roll first!");
+            delay(2000);
         }
     }
-    else
-    {
-        Serial.println("P2 needs to roll first!");
-        delay(2000);
-    }
-    }
-    
-    
-
-    
 }
 
 void rollDie()
@@ -174,7 +166,7 @@ void readData()
         int_num = num.toInt();
         roll = client.readStringUntil('\n');
     }
-        /* Serial.println(line);
+    /* Serial.println(line);
         Serial.println(num);
         Serial.println(roll);
         Serial.println("End of Read func"); */
@@ -190,7 +182,7 @@ void sendData()
     {
         Serial.println("Connected to server");
         delay(50);
-        client.println("GET " + senduri + "P1=" + dataDie +"," + "Roll=" + rollCount + " HTTP/1.1");
+        client.println("GET " + senduri + "P1=" + dataDie + "," + "Roll=" + rollCount + " HTTP/1.1");
         client.println("Host: " + hostname);
         client.println("Connection: close");
         client.println();
@@ -221,7 +213,7 @@ void wifiInit()
     if (WiFi.status() == WL_NO_SHIELD)
     {
         Serial.println("WiFi shield not present");
-        
+
         // Don't continue
         while (true)
             ;
@@ -232,13 +224,13 @@ void wifiInit()
     {
         Serial.print("Attempting to connect to SSID: ");
         Serial.println(ssid);
-        
+
         // Connect to WPA/WPA2 network
         status = WiFi.begin(ssid, pass);
     }
 
     Serial.println("You're connected to the network");
-    
+
     printWifiStatus();
     Serial.println();
 }
@@ -248,12 +240,11 @@ void printWifiStatus()
     // print the SSID of the network you're attached to
     Serial.print("SSID: ");
     Serial.println(WiFi.SSID());
-    
+
     // print your WiFi shield's IP address
     IPAddress ip = WiFi.localIP();
     Serial.print("IP Address: ");
     Serial.println(ip);
-    
 
     // print the received signal strength
     long rssi = WiFi.RSSI();
