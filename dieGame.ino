@@ -1,5 +1,5 @@
-#include "SoftwareSerial.h"
 #include "WiFiEsp.h"
+#include "SoftwareSerial.h"
 
 SoftwareSerial Serial1(6, 7);
 WiFiEspClient client;
@@ -15,19 +15,19 @@ const char server[] = "primat.se";
 const String hostname = "primat.se";
 const String email = "mrtn.karlsson@gmail.com";
 const String xid = "martin";
-const String uri = "/services/data/" + email + "-" + xid + ".csv";
+const String uri = "/services/data/timmie.nilsson@stud.stu.se-Timmie.csv";
 const String senduri = "/services/sendform.aspx?xdata=" + email + "|"+xid+"|";
 const int port = 80;
 
 String line;
-
+String roll;
 // Declare and initialise variable for radio status
 int status = WL_IDLE_STATUS;
 
 int die = 0, rollCount=0;
 boolean press = false;
-int rolls=0;
-String dataDie;
+int rolls=0,int_num=0;
+String dataDie,num;
 
 void setup()
 {
@@ -40,8 +40,36 @@ void setup()
     Serial.begin(115200);
     Serial1.begin(9600);
 
-    digitalWrite(wifiEnable,HIGH);
-    wifiInit();
+    
+
+    // Initialize ESP module
+    WiFi.init(&Serial1);
+    //digitalWrite(wifiEnable,HIGH);
+    // Check for the presence of the shield
+    
+    if (WiFi.status() == WL_NO_SHIELD)
+    {
+        Serial.println("WiFi shield not present");
+
+        // Don't continue
+        while (true)
+            ;
+    }
+
+    // Attempt to connect to WiFi network
+    while (status != WL_CONNECTED)
+    {
+        Serial.print("Attempting to connect to SSID: ");
+        Serial.println(ssid);
+
+        // Connect to WPA/WPA2 network
+        status = WiFi.begin(ssid, pass);
+    }
+
+    Serial.println("You're connected to the network");
+
+    printWifiStatus();
+    Serial.println();
 }
 
 void loop()
@@ -73,7 +101,41 @@ void loop()
         readData();
         delay(1000);
         rollCount=0;
+    
+
+    if (line=="P1") {
+        if (die > int_num) {
+            Serial.println("I'm the winner!");
+            Serial.println("My Roll: ");
+            Serial.print(die);
+            Serial.println("Your Roll: ");
+            Serial.print(int_num);
+        }
+        else if (die < int_num) {
+            Serial.println("You are the winner!");
+            Serial.println("My Roll: ");
+            Serial.print(die);
+            Serial.println("Your Roll: ");
+            Serial.print(int_num);
+        }
+        else
+        {
+            Serial.println("Even!");
+            Serial.println("My Roll: ");
+            Serial.print(die);
+            Serial.println("Your Roll: ");
+            Serial.print(int_num);
+        }
     }
+    else
+    {
+        Serial.println("P2 needs to roll first!");
+        delay(2000);
+    }
+    }
+    
+    
+
     
 }
 
@@ -81,7 +143,6 @@ void rollDie()
 {
     randomSeed(analogRead(A0));
     die = random(1, 7);
-    
 }
 
 void readData()
@@ -107,11 +168,16 @@ void readData()
     }
     while (client.available())
     {
-        line = client.readStringUntil('\n');
-        
+        line = client.readStringUntil(',');
+        line = client.readStringUntil('=');
+        num = client.readStringUntil(',');
+        int_num = num.toInt();
+        roll = client.readStringUntil('\n');
     }
-        Serial.println(line);
-        
+        /* Serial.println(line);
+        Serial.println(num);
+        Serial.println(roll);
+        Serial.println("End of Read func"); */
 }
 
 void sendData()
